@@ -30,6 +30,7 @@ bansimplified-boilerplate-using-react/
 │   │   └── utils.ts       # Library-specific utilities
 │   ├─ services/          # API services (fetch/axios calls, API integration)
 │   │   └── axios.ts
+│   ├─ styles/            # Style Where The Styling is happening
 │   ├─ types/             # Global TypeScript type definitions
 │   ├─ utils/             # General utility functions (helpers, formatters)
 │   │   ├─ redirectByRole.ts
@@ -72,6 +73,8 @@ Here's a breakdown of what each folder in the project is for:
     *   **`lib/`**: A place for library initializations and utility functions. This includes configuring third-party libraries like the Supabase client in `superbase.ts`.
 
     *   **`services/`**: Used for API communication logic. This is where you would put your functions for making API calls (e.g., using `fetch` or `axios`) to interact with backend services like Supabase.
+
+    *   **'styles/'**: Dedicated to application styling and visual design assets. This directory centralizes global stylesheets, theme definitions, CSS variables, Tailwind customizations, and reusable style modules to ensure consistent visual identity and maintainable UI architecture across the entire application.
 
 ## Tech Stack
 

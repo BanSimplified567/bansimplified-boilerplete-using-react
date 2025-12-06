@@ -17,12 +17,7 @@ export default defineConfig({
       "@app": path.resolve(__dirname, "src/app"),
       "@components": path.resolve(__dirname, "src/components"),
       "@hooks": path.resolve(__dirname, "src/hooks"),
-      "@pages": path.resolve(__dirname, "src/pages"),
-      "@controllers": path.resolve(__dirname, "src/controllers"),
-      "@models": path.resolve(__dirname, "src/models"),
-      "@routes": path.resolve(__dirname, "src/routes"),
-      "@databases": path.resolve(__dirname, "src/databases"),
-      "@middlewares": path.resolve(__dirname, "src/middlewares")
+      "@styles": path.resolve(__dirname, "src/styles"),
     }
   }
 });
