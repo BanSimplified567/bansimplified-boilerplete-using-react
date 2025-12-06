@@ -11,10 +11,7 @@ const SignupForm: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [firstname, setFirstname] = useState<string>('');
   const [lastname, setLastname] = useState<string>('');
-  const [phone, setPhone] = useState<string>('');
-  const [address, setAddress] = useState<string>('');
-  const [city, setCity] = useState<string>('');
-  const [zipcode, setZipcode] = useState<string>('');
+
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -71,11 +68,6 @@ const SignupForm: React.FC = () => {
       return false;
     }
 
-    if (phone && phone.replace(/\D/g, '').length < 10) {
-      setError('Please enter a valid phone number.');
-      return false;
-    }
-
     if (!acceptTerms) {
       setError('Please accept the Terms & Conditions to continue.');
       return false;
@@ -100,10 +92,7 @@ const SignupForm: React.FC = () => {
           data: {
             firstname,
             lastname,
-            phone: phone || null,
-            address: address || null,
-            city: city || null,
-            zipcode: zipcode || null,
+
             role: 'customer',
           },
           emailRedirectTo: buildRedirect('/auth/callback')
@@ -121,10 +110,7 @@ const SignupForm: React.FC = () => {
         setEmail('');
         setFirstname('');
         setLastname('');
-        setPhone('');
-        setAddress('');
-        setCity('');
-        setZipcode('');
+
         setAcceptTerms(false);
       }, 3000);
 
@@ -142,10 +128,6 @@ const SignupForm: React.FC = () => {
     const formData = {
       firstname,
       lastname,
-      phone,
-      address,
-      city,
-      zipcode,
     };
 
     localStorage.setItem('pendingOAuthSignup', JSON.stringify(formData));
@@ -174,16 +156,7 @@ const SignupForm: React.FC = () => {
     }
   };
 
-  const formatPhoneNumber = (value: string) => {
-    const phoneNumber = value.replace(/\D/g, '');
-    const phoneNumberLength = phoneNumber.length;
 
-    if (phoneNumberLength < 4) return phoneNumber;
-    if (phoneNumberLength < 7) {
-      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
-    }
-    return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-8">

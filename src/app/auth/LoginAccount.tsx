@@ -1,13 +1,11 @@
 import { supabase } from '@/lib/supebase';
 import { buildRedirect } from '@/utils/redirect';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
 
   const handleEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
