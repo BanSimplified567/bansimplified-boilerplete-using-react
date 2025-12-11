@@ -4,38 +4,52 @@ bansimplified-boilerplate-using-react/
 ├─ public/                 # Static files
 │   └── vite.svg           # Vite logo/placeholder image
 ├─ src/                    # Source code
-│   ├─ app/               # Page components for routing (often used with React Router)
-│   │   ├─ Terms.tsx
-│   │   ├─ admin/
-│   │   │   └── Dashboard.tsx
-│   │   ├─ auth/
-│   │   │   ├─ AuthCallback.tsx
-│   │   │   ├─ LoginAccount.tsx
-│   │   │   └── SignUpAccount.tsx
-│   │   └─ user/
-│   │       └── Index.tsx
+│   ├─ app/               # Page components for routing (using React Router with file-based routing)
+│   │   ├─ NotFound.tsx
+│   │   ├─ (auth)/        # Auth-related pages (LoginAccount.tsx, SignUpAccount.tsx, AuthCallback.tsx)
+│   │   ├─ (dashboard)/   # Dashboard pages (e.g., admin/Dashboard.tsx)
+│   │   ├─ (infromation)/ # Information pages
+│   │   └─ (root)/        # Root pages (e.g., AboutUs.tsx, ContactUs.tsx, Menu.tsx)
 │   ├─ assets/            # Static assets (images, icons, fonts)
 │   │   └── react.svg
 │   ├─ components/        # Reusable UI components (Button, Card, Modal, etc.)
 │   │   ├─ layout/
-│   │   ├─ shared/
 │   │   └─ ui/
-│   │       ├─ card.tsx
-│   │       ├─ skeleton.tsx
-│   │       └─ table.tsx
-│   ├─ hooks/             # Custom React hooks (useAuth, useLocalStorage, etc.)
-│   │   └── useLogout.tsx
+│   ├─ contexts/          # React contexts for state management
+│   │   └── TanstackProvider.tsx
+│   ├─ db/                # Database-related code and API definitions
+│   │   └─ api/
+│   │       └── auth.api.ts
+│   ├─ hooks/             # Custom React hooks
+│   │   ├─ use-mobile.ts
+│   │   ├─ useLogout.tsx
+│   │   └─ useToken.ts
 │   ├─ lib/               # Library utilities and configurations
-│   │   ├─ supebase.ts    # Supabase client configuration
-│   │   └── utils.ts       # Library-specific utilities
+│   │   ├─ socket.ts
+│   │   ├─ supabase.ts    # Supabase client configuration
+│   ├─ middleware/        # Middleware for routing and auth
+│   │   └── authMiddleware.ts
+│   ├─ routes/            # Routing configuration
+│   │   ├─ _root.tsx
+│   │   └─ routers/
+│   │       ├─ dash.routes.ts
+│   │       └─ root.route.ts
 │   ├─ services/          # API services (fetch/axios calls, API integration)
-│   │   └── axios.ts
-│   ├─ styles/            # Style Where The Styling is happening
+│   │   ├─ appUrl..ts
+│   │   └─ axios.ts
+│   ├─ styles/            # Application styling
 │   ├─ types/             # Global TypeScript type definitions
+│   │   ├─ app.types.ts
+│   │   ├─ app/
+│   │   │   └── auth.type.ts
+│   │   └─ lib-defs/
+│   │       └── env.d.ts
 │   ├─ utils/             # General utility functions (helpers, formatters)
+│   │   ├─ redirect.ts
 │   │   ├─ redirectByRole.ts
-│   │   └─ utils.ts
-│   ├─ App.tsx            # Root React component
+│   │   └─ utils.ts       # Library-specific utilities
+│   ├─ validators/        # Validation schemas (e.g., using Zod)
+│   │   └── auth.validator.ts
 │   ├─ index.css          # Global CSS styles (includes Tailwind directives)
 │   └─ main.tsx           # Application entry point (renders React to DOM)
 ├─ .env                   # Environment variables (NOT committed to git)
@@ -70,11 +84,27 @@ Here's a breakdown of what each folder in the project is for:
 
     *   **`hooks/`**: Contains custom React hooks (e.g., `useAuth`, `useLocalStorage`) that encapsulate and reuse stateful logic across components.
 
-    *   **`lib/`**: A place for library initializations and utility functions. This includes configuring third-party libraries like the Supabase client in `superbase.ts`.
+    *   **`contexts/`**: React contexts for global state management, such as Tanstack (React Query) provider.
 
-    *   **`services/`**: Used for API communication logic. This is where you would put your functions for making API calls (e.g., using `fetch` or `axios`) to interact with backend services like Supabase.
+    *   **`db/`**: Database API definitions and queries, e.g., auth-related API calls.
 
-    *   **'styles/'**: Dedicated to application styling and visual design assets. This directory centralizes global stylesheets, theme definitions, CSS variables, Tailwind customizations, and reusable style modules to ensure consistent visual identity and maintainable UI architecture across the entire application.
+    *   **`hooks/`**: Custom React hooks for logic reuse, including mobile detection, logout, and token management.
+
+    *   **`lib/`**: Library initializations and utilities, including Supabase client in `supabase.ts` and socket connections.
+
+    *   **`middleware/`**: Custom middleware for authentication and routing guards.
+
+    *   **`routes/`**: Routing setup using React Router, with root and dashboard routes.
+
+    *   **`services/`**: API service layers using Axios for backend interactions.
+
+    *   **`styles/`**: Centralized styling files and configurations.
+
+    *   **`types/`**: TypeScript type definitions for app, auth, and environment.
+
+    *   **`utils/`**: Utility functions for redirects, formatting, and general helpers.
+
+    *   **`validators/`**: Zod-based validation schemas, e.g., for auth forms.
 
 ## Tech Stack
 
@@ -116,13 +146,16 @@ This project is built using the following technologies:
    This will install all required Node.js packages listed in `package.json`.
 
 4. **Create Supabase Connection File**
-   Ensure `src/lib/superbase.ts` exists with the following content to set up the Supabase client:
+   Ensure `src/lib/supabase.ts` exists with the following content to set up the Supabase client:
    ```ts
-   import { createClient } from "@supabase/supabase-js";
+   import { createClient } from '@supabase/supabase-js';
 
-   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL!;
-   const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY!;
-   export const supabase = createClient(supabaseUrl, supabaseKey);
+   // Pull Supabase credentials from environment variables
+   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+   // Create the Supabase client
+   export const supabase = createClient(supabaseUrl, supabaseAnonKey);
    ```
 
 5. **Create Environment Variables Example File**
@@ -140,22 +173,65 @@ This project is built using the following technologies:
    cp .env.example .env
    ```
 
-7. **Set Up Google OAuth in Google Cloud Console**
-   1. Go to [Google Cloud Console](https://console.cloud.google.com/).
-   2. Create a new project or select an existing project.
-   3. Navigate to **APIs & Services > Credentials**.
-   4. Click **Create Credentials > OAuth Client ID**.
-   5. Configure the consent screen with your app details.
-   6. Choose **Web Application** and set the **Authorized redirect URIs** to your app's callback URL (e.g., `http://localhost:5173/auth/callback`).
-   7. Copy the generated **Client ID** and **Client Secret** into your `.env` file:
+7. **Set Up Google OAuth**
+   To integrate Google OAuth with Supabase:
+
+   a. **In Google Cloud Console:**
+      1. Go to [Google Cloud Console](https://console.cloud.google.com/).
+      2. Create a new project or select an existing one.
+      3. Enable the Google+ API (or relevant APIs) if needed.
+      4. Navigate to **APIs & Services > Credentials**.
+      5. Configure the OAuth consent screen (app name, user support email, developer contact).
+      6. Click **Create Credentials > OAuth 2.0 Client ID**.
+      7. Select **Web application**.
+      8. Add **Authorized JavaScript origins** (e.g., `http://localhost:5173` for dev).
+      9. Add **Authorized redirect URIs** using your Supabase project's auth callback: `https://<your-project-ref>.supabase.co/auth/v1/callback`.
+      10. Note the generated **Client ID** and **Client Secret** (generate secret if not provided).
+
+   b. **In Supabase Dashboard:**
+      1. Go to your Supabase project dashboard.
+      2. Navigate to **Authentication > Providers**.
+      3. Enable **Google** provider.
+      4. Paste the **Client ID** and **Client Secret** from Google.
+      5. Save changes.
+
+   c. **Update .env:**
+      Add to your `.env` file:
       ```env
       VITE_GOOGLE_CLIENT_ID=your_generated_client_id
       VITE_GOOGLE_CLIENT_SECRET=your_generated_client_secret
       ```
 
-8. **Test the Setup**
+8. **Set Up GitHub OAuth**
+   To integrate GitHub OAuth with Supabase:
+
+   a. **In GitHub Developer Settings:**
+      1. Go to [GitHub Settings](https://github.com/settings/developers).
+      2. Navigate to **Developer settings > OAuth Apps**.
+      3. Click **New OAuth App**.
+      4. Provide **Application name** (e.g., your app name).
+      5. Set **Homepage URL** (e.g., `http://localhost:5173` for dev).
+      6. Set **Authorization callback URL** to your Supabase project's auth callback: `https://<your-project-ref>.supabase.co/auth/v1/callback`.
+      7. Click **Register application**.
+      8. Copy the **Client ID** and generate/click **Generate a new client secret** to get the **Client Secret**.
+
+   b. **In Supabase Dashboard:**
+      1. Go to your Supabase project dashboard.
+      2. Navigate to **Authentication > Providers**.
+      3. Enable **GitHub** provider.
+      4. Paste the **Client ID** and **Client Secret** from GitHub.
+      5. Save changes.
+
+   c. **Update .env:**
+      Add to your `.env` file:
+      ```env
+      VITE_GITHUB_CLIENT_ID=your_generated_client_id
+      VITE_GITHUB_CLIENT_SECRET=your_generated_client_secret
+      ```
+
+9. **Test the Setup**
    Run the development server:
    ```bash
    npm run dev
    ```
-   Verify that the Supabase connection and Google OAuth integration work by checking the browser console for errors and ensuring authentication flows correctly.
+   Verify Supabase connection, Google, and GitHub OAuth by testing login flows, checking browser console for errors, and ensuring redirects work with the Supabase callback.
