@@ -17,7 +17,7 @@ import type { UserData } from '@/types/users';
 import {
   clearUserDataFromLocalStorage
 } from '@/utils/user';
-import IsladelCafeLogo from '@assets/IslaDelCafeLogoText.png';
+import IsladelCafeLogo from '@/assets/IslaDelCafeLogoText.png';
 
 const NAV_LINKS = [
   { path: '/index', label: 'HOME' },
