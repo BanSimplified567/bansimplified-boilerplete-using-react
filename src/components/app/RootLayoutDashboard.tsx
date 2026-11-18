@@ -88,12 +88,6 @@ export default function RootLayoutDashboard() {
 
   const isActive = userData.status === "active";
 
-  const isCustomer = userData.role === "customer" && isActive;
-
-  const isElevated =
-    ["admin", "manager", "staff"].includes(userData.role ?? "") &&
-    isActive;
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -107,10 +101,7 @@ export default function RootLayoutDashboard() {
   }
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      data-role={isCustomer ? "customer" : isElevated ? "staff" : "unknown"}
-    >
+    <div className="min-h-screen flex flex-col">
       <main className="flex-1 pt-16">
         <Outlet />
       </main>
