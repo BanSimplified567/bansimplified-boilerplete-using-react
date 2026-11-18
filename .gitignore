@@ -27,3 +27,6 @@ dist-ssr
 .env.*.local
 .env.testing
 .env.production.local
+
+# TypeScript declaration files
+*.d.ts
