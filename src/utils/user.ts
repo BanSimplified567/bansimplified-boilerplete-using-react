@@ -1,6 +1,6 @@
 // src/utils/user.ts
 import { supabase } from '@/lib/supabase';
-import type { AuthUser, User, UserData } from '@/types/users';
+import type { AuthUser, Profile, User, UserData } from '@/types/users';
 import type { Session } from '@supabase/supabase-js';
 
 /* --------------------------- OAuth Helpers --------------------------- */
@@ -133,6 +133,7 @@ export const shouldRememberUser = (): boolean => {
 };
 
 /* --------------------------- Profile Helpers --------------------------- */
+
 export async function ensureUserProfile(
   session: Session,
   formData: Partial<User> | null = null
@@ -142,74 +143,109 @@ export async function ensureUserProfile(
   }
 
   const userId = session.user.id;
+  const metadata = session.user.user_metadata ?? {};
 
-  // Check if user profile already exists
+  // Check existing profile
   const { data: existing, error: fetchError } = await supabase
-    .from('users')
+    .from('profiles')
     .select('*')
     .eq('id', userId)
     .maybeSingle();
 
-  if (fetchError) {
-    console.error('Error fetching user profile:', fetchError);
-    throw fetchError;
-  }
+  if (fetchError) throw fetchError;
 
   if (existing) {
-    return existing as User;
+    return {
+      ...existing,
+      firstname: existing.firstname ?? '',
+      lastname: existing.lastname ?? '',
+      email: existing.email ?? session.user.email ?? '',
+      phone: existing.phone_number ?? null,
+    } as User;
   }
 
-  // Create new profile from available data
-  const metadata = session.user.user_metadata ?? {};
-  const nameParts = metadata.full_name?.split(' ') || [];
-  const firstName = nameParts[0] || '';
-  const lastName = nameParts.slice(1).join(' ') || '';
+  // Extract name information
+  const fullName =
+    metadata.full_name ??
+    metadata.name ??
+    '';
 
-  const profile: User = {
+  const nameParts = fullName.split(' ');
+  const firstname =
+    formData?.firstname ??
+    metadata.firstname ??
+    nameParts[0] ??
+    'User';
+
+  const lastname =
+    formData?.lastname ??
+    metadata.lastname ??
+    nameParts.slice(1).join(' ') ??
+    '';
+
+  const profile = {
     id: userId,
-    email: session.user.email || '',
-    firstname: formData?.firstname || metadata.firstname || firstName || 'User',
-    lastname: formData?.lastname || metadata.lastname || lastName || '',
-    phone: formData?.phone || metadata.phone || null,
-    address: formData?.address || metadata.address || null,
-    city: formData?.city || metadata.city || null,
-    zipcode: formData?.zipcode || metadata.zipcode || null,
+    username: metadata.username ?? null,
+    firstname,
+    lastname,
+    full_name: `${firstname} ${lastname}`.trim(),
+    email: session.user.email ?? '',
+    avatar_url: metadata.avatar_url ?? metadata.picture ?? null,
+    phone_number: formData?.phone ?? metadata.phone ?? null,
+    address: formData?.address ?? metadata.address ?? null,
+    city: formData?.city ?? metadata.city ?? null,
+    zipcode: formData?.zipcode ?? metadata.zipcode ?? null,
     role: 'customer',
     status: 'active',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
   };
 
-  // Insert new profile
   const { data: inserted, error: insertError } = await supabase
-    .from('users')
+    .from('profiles')
     .insert(profile)
     .select()
     .single();
 
   if (insertError) {
     console.error('Error creating user profile:', insertError);
-
-    // Return the profile object we tried to insert (without database ID)
-    // This maintains consistency even if DB insert fails
-    return profile;
+    throw insertError;
   }
 
-  return inserted as User;
+  return {
+    ...inserted,
+    phone: inserted.phone_number,
+  } as User;
 }
 
-export const convertProfileToUserData = (profile: User): UserData => ({
-  id: profile.id,
-  firstname: profile.firstname ?? null,
-  lastname: profile.lastname ?? null,
-  email: profile.email,
-  role: profile.role,
-  status: profile.status,
-});
 
+export function convertProfileToUser(profile: Profile | User): User {
+  const phone = (profile as Profile).phone_number ?? (profile as User).phone ?? null;
+  return {
+    id: profile.id,
+    username: profile.username ?? null,
+
+    firstname: profile.firstname ?? null,
+    lastname: profile.lastname ?? null,
+    full_name: profile.full_name ?? null,
+
+    email: profile.email ?? '',
+
+    avatar_url: profile.avatar_url ?? null,
+    phone: phone,
+
+    address: profile.address ?? null,
+    city: profile.city ?? null,
+    zipcode: profile.zipcode ?? null,
+
+    role: profile.role,
+    status: profile.status,
+
+    created_at: profile.created_at ?? undefined,
+    updated_at: profile.updated_at ?? undefined,
+  };
+}
 export const saveUserIfRemember = (user: User): void => {
   if (shouldRememberUser() && user) {
-    saveUserDataToLocalStorage(convertProfileToUserData(user));
+    saveUserDataToLocalStorage(convertProfileToUser(user));
   }
 };
 
@@ -242,21 +278,17 @@ export async function getCurrentUser(): Promise<UserData | null> {
   try {
     // Fetch user profile from database
     const { data: profile, error: profileError } = await supabase
-      .from('users')
-      .select('id, firstname, lastname, email, role, status')
-      .eq('id', session.user.id)
-      .single();
+  .from('profiles')
+  .select('id, firstname, lastname, email, role, status, phone_number')
+  .eq('id', session.user.id)
+  .single();
 
-    if (profileError) {
-      console.error('Error fetching user profile:', profileError);
-      return null;
-    }
+ if (profileError || !profile) {
+  console.error('Error fetching user profile:', profileError);
+  return null;
+}
 
-    if (!profile) {
-      return null;
-    }
-
-    const userData = convertProfileToUserData(profile as User);
+    const userData = convertProfileToUser(profile as Profile);
 
     // Save to localStorage if remember me is enabled
     if (shouldRememberUser()) {

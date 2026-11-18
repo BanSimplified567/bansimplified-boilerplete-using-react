@@ -26,9 +26,16 @@ export const authMiddleware = async (pathname: string): Promise<AuthSuccessRespo
     }
 
     // Get or create user profile
-    const user = await ensureUserProfile(session);
-    const resolvedRole = user.role || 'customer';
-    saveUserIfRemember(user);
+const user = await ensureUserProfile(session);
+
+if (user.status !== 'active') {
+  await supabase.auth.signOut();
+  throw redirect({ to: '/' });
+}
+
+const resolvedRole = user.role || 'customer';
+
+saveUserIfRemember(user);
 
     const homePath = redirectByRole(resolvedRole);
     const isElevatedUser = ['admin', 'manager', 'staff'].includes(resolvedRole);

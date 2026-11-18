@@ -152,7 +152,7 @@ function NavbarAdmin({ isCollapsed, setIsCollapsed, mobileOpen, setMobileOpen, i
 
     // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (_event, session) => {
         if (session?.user) {
           const { data: profile } = await supabase
             .from('users')

@@ -14,15 +14,9 @@ const NotFound = () => {
         </p>
 
         <div className="index-error-actions">
-          { userData?.role === 'customer' ? (
-            <Link to="/" className="index-error-button-primary">
-              Back to Home
-            </Link>
-          ) : (
-            <Link to="/" className="index-error-button-primary">
-              Go to Admin Login
-            </Link>
-          ) }
+          <Link to="/" className="index-error-button-primary">
+            Back to Home
+          </Link>
         </div>
       </div>
     </div>
