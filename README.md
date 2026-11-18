@@ -137,7 +137,7 @@ This project is built using the following technologies (versions from package.js
 
    // Pull Supabase credentials from environment variables
    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
    // Create the Supabase client
    export const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -147,7 +147,7 @@ This project is built using the following technologies (versions from package.js
    Create a `.env.example` file in the root directory (if not present) with placeholder values for Supabase and Google OAuth configuration:
    ```env
    VITE_SUPABASE_URL=your_supabase_project_url_here
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+   VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key_here
    VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
    VITE_GOOGLE_CLIENT_SECRET=your_google_client_secret_here
    VITE_GITHUB_CLIENT_ID=your_github_client_id_here
