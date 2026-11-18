@@ -2,7 +2,11 @@
 bansimplified-react-boilerplate/
 │
 ├─ public/                 # Static files
-│   └── vite.svg           # Vite logo/placeholder image
+│   ├── vite.svg           # Vite logo/placeholder image
+│   └── website(img)/      # Auth & dashboard images
+│       ├── createaccount.png
+│       ├── loginaccount.png
+│       └── tmp-dashboard.png
 ├─ src/                    # Source code
 │   ├─ App.tsx             # Main App component
 │   ├─ index.css           # Global CSS styles (includes Tailwind directives)
@@ -63,6 +67,25 @@ bansimplified-react-boilerplate/
 Here's a breakdown of what each folder in the project is for:
 
 *   **`public/`**: This directory contains static assets that are not processed by the build tool. Files here are served at the root path. It's suitable for assets like `robots.txt` or web manifest files.
+
+    *   **`public/website(img)/`**: Contains UI images used in the authentication and dashboard pages.
+        *   `loginaccount.png` - Login account illustration/image used on the login page.
+        *   `createaccount.png` - Sign up account illustration/image used on the sign up page.
+        *   `tmp-dashboard.png` - Temporary dashboard preview image.
+
+    ### Images
+
+    #### loginaccount.png
+    ![Login Account](public/website(img)/loginaccount.png)
+    This image is displayed on the **Login** page (`src/pages/(auth)/LoginAccount.tsx`). It serves as a visual illustration/hero graphic for the user authentication login form, helping to brand the login experience and guide users to enter their credentials.
+
+    #### createaccount.png
+    ![Create Account](public/website(img)/createaccount.png)
+    This image is displayed on the **Sign Up** page (`src/pages/(auth)/SignUpAccount.tsx`). It serves as a visual illustration/hero graphic for the user registration form, welcoming new users and reinforcing the account creation flow.
+
+    #### tmp-dashboard.png
+    ![Temporary Dashboard](public/website(img)/tmp-dashboard.png)
+    This is a temporary placeholder/preview image used during dashboard development (`src/pages/(dashboard)/Dashboard.tsx`). It provides a visual scaffold for the dashboard layout before the final content is implemented.
 
 *   **`src/`**: This is where all your application's source code lives.
 

@@ -20,6 +20,4 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
-console.log('Supabase URL:', supabaseUrl);
-console.log('Publishable Key exists:', !!supabaseAnonKey);
 
