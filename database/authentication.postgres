@@ -1,0 +1,38 @@
+
+-- ==========================================
+-- USERS TABLE
+-- ==========================================
+
+CREATE TABLE IF NOT EXISTS public.users (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email TEXT UNIQUE,
+    full_name TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ==========================================
+-- PROFILES TABLE
+-- ==========================================
+
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    username TEXT UNIQUE,
+    full_name TEXT,
+    avatar_url TEXT,
+    phone_number TEXT,
+
+    role TEXT DEFAULT 'customer'
+        CHECK (role IN ('user', 'admin')),
+
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+
+    firstname TEXT,
+    lastname TEXT,
+    email TEXT,
+    address TEXT,
+    city TEXT,
+    zipcode TEXT,
+
+    status TEXT DEFAULT 'active'
+);
